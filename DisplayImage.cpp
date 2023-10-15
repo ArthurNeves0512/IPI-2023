@@ -62,13 +62,21 @@ void interPololacaoMedia(unsigned char * imagemParaInterpolar,int quantColunaMat
                 }
                 
             }
-            else{
-                media = ptrImagemInterpolar[linhaAtual-1*quantColunaMatrizMaior +colunaAtual];
-                superior = ptrImagemInterpolar[linhaAtual*quantColunaMatrizMaior+colunaAtual-quantColunaMatrizMaior];
-                ptrImagemInterpolar[linhaAtual*quantColunaMatrizMaior+colunaAtual]=superior;
+        }
+    }
+
+    for(int linhaAtual =0;linhaAtual<quantLinhaMatrizMaior;linhaAtual++){
+        for( int colunaAtual =0;colunaAtual<quantColunaMatrizMaior;colunaAtual++){
+            if(linhaAtual%2!=0){
+                unsigned char superior = ptrImagemInterpolar[(linhaAtual-1)*quantColunaMatrizMaior+colunaAtual];
+                unsigned char inferior = ptrImagemInterpolar[(linhaAtual+1)*quantColunaMatrizMaior+colunaAtual];
+                unsigned char media = (superior+inferior)/2;
+                ptrImagemInterpolar[colunaAtual + linhaAtual*quantColunaMatrizMaior]=media;
             }
         }
     }
+    
+    
 }
 
 void lerYuV(std::string nome, int colunas,int linhas,int frame=0){
@@ -96,7 +104,6 @@ void lerYuV(std::string nome, int colunas,int linhas,int frame=0){
 
     cv::Mat imageAntes = cv::Mat(linhas/2,colunas/2,CV_8U,v);
     cv::namedWindow("original",cv::WINDOW_FULLSCREEN|cv::WINDOW_AUTOSIZE);
-    //cv::imshow("original",cv::Mat(linhas/2,colunas/2,CV_8U, v));
     
     dobrarImagem((unsigned char *)v,*vMaior,colunas/2,linhas/2,colunas,linhas);
     interPololacaoMedia(*vMaior,colunas,linhas);
@@ -114,6 +121,7 @@ void lerYuV(std::string nome, int colunas,int linhas,int frame=0){
 
     cv::merge(imagemReconstruída,imagemJunta);
     cv::cvtColor(imagemJunta,imagemColorida,cv::COLOR_YUV2BGR);
+    cv::imshow("antes", cv::Mat(linhas/2,colunas/2,CV_8U, v));
     cv::imshow("original",imagemColorida);
     cv::waitKey(0);
 }
