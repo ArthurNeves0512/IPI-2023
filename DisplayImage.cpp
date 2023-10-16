@@ -121,14 +121,39 @@ void lerYuV(std::string nome, int colunas,int linhas,int frame=0){
 
     cv::merge(imagemReconstruída,imagemJunta);
     cv::cvtColor(imagemJunta,imagemColorida,cv::COLOR_YUV2BGR);
-    cv::imshow("antes", cv::Mat(linhas/2,colunas/2,CV_8U, v));
-    cv::imshow("original",imagemColorida);
+    // cv::imshow("antes", cv::Mat(linhas/2,colunas/2,CV_8U, v));
+    //cv::imshow("original",imagemColorida);
+    cv::Mat imagemComFiltragemNoDominioEspacial;
     cv::waitKey(0);
 }
 
+cv::Mat agucamentoLaplaciano(std::string nomeDaImagem,cv::Mat_<int> filtro){
+    cv::Mat imgLida = cv::imread(nomeDaImagem);
+    cv::Mat imagemFiltrada;
+    cv::filter2D(imgLida,imagemFiltrada,-1,filtro);
+    return imagemFiltrada;
+}
+
+
 int main(){
 
-    lerYuV("foreman.yuv",352,288,10);
+    //lerYuV("foreman.yuv",352,288,10);
+    cv::Mat_<int> kernel(3,3);
+    kernel<<1,1,1,1,-8,1,1,1,1;
+    // cv::Mat img = cv::imread("Image1.pgm");
+    // cv::imshow("aaaaaa", img);
+    cv::Mat result;
+    cv::GaussianBlur(cv::imread("Image1.pgm",cv::IMREAD_GRAYSCALE),result,cv::Size(3,3),1.0);
+    cv::Mat_<float> kernel2(3,3);
+    kernel2<< 0, 1, 0, 1, -4, 1, 0, 1, 0;
+    cv::Mat laplacian;
+    cv::filter2D(result,laplacian,-1,kernel2);
+    cv::imshow("meu deus", laplacian);
+    // cv::waitKey(0);
+    // result= agucamentoLaplaciano("Image1.pgm",kernel);
+    // cv::imshow("meu deus", result);
+    cv::waitKey(0);
+
 }
 
 
