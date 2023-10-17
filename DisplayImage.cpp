@@ -142,16 +142,69 @@ int main(){
     kernel<<1,1,1,1,-8,1,1,1,1;
     // cv::Mat img = cv::imread("Image1.pgm");
     // cv::imshow("aaaaaa", img);
-    cv::Mat result;
-    cv::GaussianBlur(cv::imread("Image1.pgm",cv::IMREAD_GRAYSCALE),result,cv::Size(3,3),1.0);
-    cv::Mat_<float> kernel2(3,3);
-    kernel2<< 0, 1, 0, 1, -4, 1, 0, 1, 0;
-    cv::Mat laplacian;
-    cv::filter2D(result,laplacian,-1,kernel2);
-    cv::imshow("meu deus", laplacian);
+    // cv::Mat result;
+    // cv::GaussianBlur(cv::imread("Image1.pgm",cv::IMREAD_GRAYSCALE),result,cv::Size(3,3),1.0);
+    // cv::Mat_<float> kernel2(3,3);
+    // kernel2<< 0, 1, 0, 1, -4, 1, 0, 1, 0;
+    // cv::Mat laplacian;
+    // cv::filter2D(result,laplacian,-1,kernel2);
+    // cv::imshow("meu deus", laplacian);
+
+    cv::Mat img = cv::imread("moire.tif",cv::IMREAD_GRAYSCALE);
+
+    cv::Mat_<float> imgFloat;
+    img.convertTo(imgFloat,CV_32FC1,1.0/255.0);
+
+
+    cv::Mat imgComplex [2]={imgFloat,cv::Mat::zeros(imgFloat.size(),CV_32F)};
+    cv::Mat dftReady;
+    cv::merge(imgComplex,2,dftReady);
+    
+    cv::Mat dftOriginal;
+    cv::Mat saida;
+
+    cv::dft(dftReady,saida,cv::DFT_COMPLEX_OUTPUT);
+    
+    cv::split(saida,imgComplex);
+    cv::magnitude(imgComplex[0],imgComplex[1],dftReady);
+    dftReady+=cv::Scalar::all(1);
+    cv::log(dftReady,dftReady);
+
+    int meioColunas=dftReady.cols/2;
+    int meioLinhas=dftReady.rows/2;
+
+    cv::Mat esquerdaSuperior(dftReady,cv::Rect(0,0,meioColunas,meioLinhas));
+    cv::Mat direitaSuperior(dftReady,cv::Rect(meioColunas,0,meioColunas,meioLinhas));
+    cv::Mat esquerdaInferior(dftReady,cv::Rect(0,meioLinhas,meioColunas,meioLinhas));
+    cv::Mat DireitaInferior(dftReady,cv::Rect(meioColunas,meioLinhas,meioColunas,meioLinhas));
+
+    cv::Mat temp;
+    esquerdaSuperior.copyTo(temp);
+    DireitaInferior.copyTo(esquerdaSuperior);
+    temp.copyTo(DireitaInferior);
+
+    direitaSuperior.copyTo(temp);
+    esquerdaInferior.copyTo(direitaSuperior);
+    temp.copyTo(esquerdaInferior);
+
+    cv::normalize(dftReady,dftReady,0,1,cv::NORM_MINMAX);
+
+    cv::namedWindow("aaaaaaaaaa",cv::WINDOW_GUI_EXPANDED);
+    
+    cv::normalize(dftReady,dftReady,0,1,cv::NORM_MINMAX);
+    
+
+
+    cv::imshow("aaaaaaaaaa",dftReady);
+
+
+    
+    
+
+    //cv::imshow("aaaaaa",dftReady);
     // cv::waitKey(0);
     // result= agucamentoLaplaciano("Image1.pgm",kernel);
-    // cv::imshow("meu deus", result);
+    //cv::imshow("meu deus", dftOriginal);
     cv::waitKey(0);
 
 }
