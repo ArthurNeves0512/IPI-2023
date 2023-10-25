@@ -319,6 +319,7 @@ void agucamento(cv::Mat img, cv::Mat kernel, float sigma){
 int main(){
     // lerYuV("foreman.yuv",352,288,10);
     filtrarNaFrequencia();
+    // cv::imshow("Imagem para Filtrar", cv::imread("moire.tif"));
     
     cv::waitKey(0);
 
