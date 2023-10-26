@@ -306,20 +306,17 @@ void filtrarNaFrequencia(){
     cv::Mat array[2]={filtro,cv::Mat::zeros(filtro.size(),CV_32F)};
     cv::Mat fim;
     cv::merge(array,2,fim);
-    cv::Mat imgFinal,imgFinal2;
-    cv::mulSpectrums(odio,fim,imgFinal,0);
+    cv::Mat imgFinal;
+    cv::mulSpectrums(fim,odio,imgFinal,0);
     
     cv::idft(imgFinal,imgFinal);
     split(imgFinal,array);
     imgFinal=array[0];
     
 
-    imgFinal.convertTo(imgFinal,CV_8U);
+    
     cv::normalize(imgFinal,imgFinal,0,255,cv::NORM_MINMAX);
-    
-    // cv::dft(filtro,filtro,cv::DFT_INVERSE|cv::DFT_REAL_OUTPUT||cv::DFT_SCALE);
-    
-    // cv::normalize(final,final,0,1,cv::NORM_MINMAX);
+    imgFinal.convertTo(imgFinal,CV_8U);
     cv::imshow("img com filtro",imgFinal);
     cv::waitKey(0);
 }
