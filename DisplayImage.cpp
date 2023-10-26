@@ -172,12 +172,17 @@ void filtrarNaFrequencia(){
     cv::Mat img = cv::imread("moire.tif",cv::IMREAD_GRAYSCALE);
 
     cv::Mat_<float> imgFloat;
-    img.convertTo(imgFloat,CV_32FC1,1.0/255.0);
-
+    img.convertTo(imgFloat,CV_32F,1.0/255.0);
+    
+    // cv::Mat arrayFloat[2]={imgFloat,cv::Mat::zeros(imgFloat.size(),CV_32F)};
+    // cv::merge(arrayFloat,2,teste2);
+    
 
     cv::Mat imgComplex [2]={imgFloat,cv::Mat::zeros(imgFloat.size(),CV_32F)};
-    cv::Mat dftReady;
+    cv::Mat dftReady,odio;
     cv::merge(imgComplex,2,dftReady);
+    cv::merge(imgComplex,2,odio);
+    cv::dft(odio,odio,cv::DFT_SCALE);
     
     cv::Mat dftOriginal;
     cv::Mat saida;
@@ -285,21 +290,37 @@ void filtrarNaFrequencia(){
     }
     cv::multiply(teste,filtro,filtro);
 
+    cv::Mat esquerdaSuperior1(filtro,cv::Rect(0,0,meioColunas,meioLinhas));
+    cv::Mat direitaSuperior1(filtro,cv::Rect(meioColunas,0,meioColunas,meioLinhas));
+    cv::Mat esquerdaInferior1(filtro,cv::Rect(0,meioLinhas,meioColunas,meioLinhas));
+    cv::Mat DireitaInferior1(filtro,cv::Rect(meioColunas,meioLinhas,meioColunas,meioLinhas));
 
+    esquerdaSuperior1.copyTo(temp);
+    DireitaInferior1.copyTo(esquerdaSuperior1);
+    temp.copyTo(DireitaInferior1);
 
+    direitaSuperior1.copyTo(temp);
+    esquerdaInferior1.copyTo(direitaSuperior1);
+    temp.copyTo(esquerdaInferior1);
 
-
+    cv::Mat array[2]={filtro,cv::Mat::zeros(filtro.size(),CV_32F)};
+    cv::Mat fim;
+    cv::merge(array,2,fim);
+    cv::Mat imgFinal,imgFinal2;
+    cv::mulSpectrums(odio,fim,imgFinal,0);
+    
+    cv::idft(imgFinal,imgFinal);
+    split(imgFinal,array);
+    imgFinal=array[0];
     
 
-    cv::Mat imgFinal;
-    // cv::mulSpectrums(dftReady,filtro,imgFinal,0);
-    cv::multiply(dftReady,filtro,filtro);
-
+    imgFinal.convertTo(imgFinal,CV_8U);
+    cv::normalize(imgFinal,imgFinal,0,255,cv::NORM_MINMAX);
     
-    cv::dft(filtro,filtro,cv::DFT_INVERSE|cv::DFT_REAL_OUTPUT||cv::DFT_SCALE);
+    // cv::dft(filtro,filtro,cv::DFT_INVERSE|cv::DFT_REAL_OUTPUT||cv::DFT_SCALE);
     
     // cv::normalize(final,final,0,1,cv::NORM_MINMAX);
-    cv::imshow("img com filtro",filtro);
+    cv::imshow("img com filtro",imgFinal);
     cv::waitKey(0);
 }
 
