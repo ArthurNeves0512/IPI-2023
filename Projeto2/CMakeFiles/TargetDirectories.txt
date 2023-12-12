@@ -1,0 +1,3 @@
+/home/arthurneves/Projetos/IPI/Projeto2/CMakeFiles/Projeto2.dir
+/home/arthurneves/Projetos/IPI/Projeto2/CMakeFiles/edit_cache.dir
+/home/arthurneves/Projetos/IPI/Projeto2/CMakeFiles/rebuild_cache.dir
