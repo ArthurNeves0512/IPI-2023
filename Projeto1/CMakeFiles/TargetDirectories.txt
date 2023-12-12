@@ -1,0 +1,3 @@
+/home/arthurneves/Projetos/IPI/Projeto1/CMakeFiles/DisplayImage.dir
+/home/arthurneves/Projetos/IPI/Projeto1/CMakeFiles/edit_cache.dir
+/home/arthurneves/Projetos/IPI/Projeto1/CMakeFiles/rebuild_cache.dir

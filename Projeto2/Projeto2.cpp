@@ -77,21 +77,21 @@ int main(){
     //temos 30 labels ou 30 componentes
     int numLabels = cv::connectedComponents(imgTreshHold,labelImage,4);
     
-    // int largestLabel = -1;
-    // int largestArea = -1;
-    // for(int label=1;numLabels;label++){
-    //     //nos criamos uma imagem binária simplesmente ele vai passando pixel por pixel para saber
-    //     // se aquele pixel é de um label do for ou não
-    //     cv::Mat mascara = label==labelImage;
-    //     // cv::imshow("mascara", mascara);
-    //     // cv::waitKey(0);
-    //     int area = cv::countNonZero(mascara);
-    //     if(area>largestArea){
-    //         largestArea=area;
-    //         largestLabel=label;
-    //     }
-    // }
-    // cv::Mat MascaraTumor = labelImage==largestLabel;
+    int largestLabel = -1;
+    int largestArea = -1;
+    for(int label=1;numLabels;label++){
+        //nos criamos uma imagem binária simplesmente ele vai passando pixel por pixel para saber
+        // se aquele pixel é de um label do for ou não
+        cv::Mat mascara = label==labelImage;
+        // cv::imshow("mascara", mascara);
+        // cv::waitKey(0);
+        int area = cv::countNonZero(mascara);
+        if(area>largestArea){
+            largestArea=area;
+            largestLabel=label;
+        }
+    }
+    cv::Mat MascaraTumor = labelImage==largestLabel;
     cv::imshow("Tumor Achado pelo tamanho",imgTreshHold);
     cv::waitKey(0);
     
