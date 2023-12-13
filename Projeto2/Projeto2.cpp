@@ -2,10 +2,12 @@
 #include<opencv2/opencv.hpp>
 #include<opencv2/core.hpp>
 #include<opencv2/imgproc.hpp>
+#include<iostream>
+#include <stdio.h>
 
-cv::Mat imgHistograma(cv::Mat src);
-
-cv::Mat imgHistograma(cv::Mat src){
+void imgHistograma(cv::Mat src);
+void identificacaoTumor(cv::Mat imagem);
+void imgHistograma(cv::Mat src){
     cv::Mat histograma;
     //eu crio uma Mat de zeros pois eu irei ficar incrementando o valor dos pixels, ou seja, quanto mais
     //claro, mais incidencia tem
@@ -47,7 +49,46 @@ cv::Mat imgHistograma(cv::Mat src){
     // cv::namedWindow("Histograma",cv::WINDOW_NORMAL);
     // cv::imshow("Histograma",histogramaImage);
     // cv::waitKey(0);
-    return histogramaImage;
+}
+void identificacaoTumor(cv::Mat imagem){
+    cv::Mat imgTreshHold;
+    cv::threshold(imagem,imgTreshHold,120,255,cv::THRESH_BINARY);
+    cv::waitKey(0);
+    cv::Mat kernelForMorpologicOperations=cv::Mat::ones(cv::Size(5,5),CV_8U);
+    cv::erode(imgTreshHold,imgTreshHold,kernelForMorpologicOperations,cv::Point(-1,-1),1);
+    cv::dilate(imgTreshHold,imgTreshHold,kernelForMorpologicOperations,cv::Point(-1,-1),1);
+    cv::erode(imgTreshHold,imgTreshHold,kernelForMorpologicOperations,cv::Point(-1,-1),1);
+    cv::dilate(imgTreshHold,imgTreshHold,kernelForMorpologicOperations,cv::Point(-1,-1),1);
+    
+    cv::Mat labelImage(imgTreshHold.size(),CV_8UC1);
+    //temos 30 labels ou 30 componentes
+    int numLabels = cv::connectedComponents(imgTreshHold,labelImage,4);
+    
+    int largestArea = -1;
+    int largestLabel = -1;
+    
+    for(int label=2;label<numLabels;label++){
+        //nos criamos uma imagem binária simplesmente ele vai passando pixel por pixel para saber
+        // se aquele pixel é de um label do for ou não
+        cv::Mat mascara = label==labelImage;
+        // cv::imshow("mascara", mascara);
+        // cv::waitKey(0);
+        int area = cv::countNonZero(mascara);
+        if(area>largestArea){
+            largestArea=area;
+            largestLabel=label;
+        }
+    }    
+    cv::Mat MascaraTumor = labelImage==largestLabel;
+    cv::imshow("threhold",imgTreshHold);
+     std::vector<std::vector<cv::Point> > contours;
+    cv::findContours(MascaraTumor,contours,cv::RETR_CCOMP,cv::CHAIN_APPROX_SIMPLE);
+    cv::cvtColor(imagem,imagem,cv::COLOR_GRAY2RGB);
+    cv::drawContours(imagem,contours,-1,cv::Scalar(0,255,0));
+
+    cv::imshow("Tumor Achado pelo tamanho",imagem);
+    cv::waitKey(0);
+    
 }
 
 int main(){
@@ -60,41 +101,8 @@ int main(){
     cv::medianBlur(img,imgFiltered,3);
     // cv::imshow("Median Blur", img);
     //A partir daqui vou aplicar o histograma na img
-
     imgHistograma(imgFiltered);
-    cv::Mat imgTreshHold;
-    cv::threshold(imgFiltered,imgTreshHold,120,255,cv::THRESH_BINARY);
-    // cv::imshow("treshhold de 120", imgTreshHold);
-    cv::waitKey(0);
-    // cv::imshow("Imagem Com threshold de 173", imgTreshHold);
-    cv::Mat kernelForMorpologicOperations=cv::Mat::ones(cv::Size(5,5),CV_8U);
-    // cv::imshow("Antess", imgTreshHold);
-    // cv::waitKey(0);
-    cv::erode(imgTreshHold,imgTreshHold,kernelForMorpologicOperations,cv::Point(-1,-1),1);
-    cv::dilate(imgTreshHold,imgTreshHold,kernelForMorpologicOperations,cv::Point(-1,-1),1);
-    // cv::imshow("Operação de Abertura", imgTreshHold);
-    cv::Mat labelImage(imgTreshHold.size(),CV_8UC1);
-    //temos 30 labels ou 30 componentes
-    int numLabels = cv::connectedComponents(imgTreshHold,labelImage,4);
-    
-    int largestLabel = -1;
-    int largestArea = -1;
-    for(int label=1;numLabels;label++){
-        //nos criamos uma imagem binária simplesmente ele vai passando pixel por pixel para saber
-        // se aquele pixel é de um label do for ou não
-        cv::Mat mascara = label==labelImage;
-        // cv::imshow("mascara", mascara);
-        // cv::waitKey(0);
-        int area = cv::countNonZero(mascara);
-        if(area>largestArea){
-            largestArea=area;
-            largestLabel=label;
-        }
-    }
-    cv::Mat MascaraTumor = labelImage==largestLabel;
-    cv::imshow("Tumor Achado pelo tamanho",imgTreshHold);
-    cv::waitKey(0);
-    
+    identificacaoTumor(imgFiltered);
 
 
     return 0;
