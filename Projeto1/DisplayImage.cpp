@@ -107,7 +107,6 @@ void lerYuV(std::string nome, int colunas,int linhas,int frame=0){
 
 
     cv::Mat imageAntes = cv::Mat(linhas/2,colunas/2,CV_8U,v);
-    cv::namedWindow("interpolação padrão",cv::WINDOW_FULLSCREEN|cv::WINDOW_AUTOSIZE);
     
     dobrarImagem((unsigned char *)v,*vMaior,colunas/2,linhas/2,colunas,linhas);
     dobrarImagem((unsigned char *)u,*uMaior,colunas/2,linhas/2,colunas,linhas);
@@ -169,7 +168,7 @@ float regeitaFiltroNotchNegative(float raio, float v,float u,float centroX,float
 }
 void filtrarNaFrequencia(){
     //Construção da imagem com o domínio da frequencia
-    cv::Mat img = cv::imread("moire.tif",cv::IMREAD_GRAYSCALE);
+    cv::Mat img = cv::imread("./imagens/moire.tif",cv::IMREAD_GRAYSCALE);
 
     cv::Mat_<float> imgFloat;
     img.convertTo(imgFloat,CV_32F,1.0/255.0);
@@ -335,9 +334,11 @@ void agucamento(cv::Mat img, cv::Mat kernel, float sigma){
     cv::waitKey(0);
 }
 int main(){
-    lerYuV("foreman.yuv",352,288,10);
+    lerYuV("./imagens/foreman.yuv",352,288,10);
+    cv::imshow("Imagem para Filtrar", cv::imread("./imagens/moire.tif"));
+    cv::waitKey(0);
     filtrarNaFrequencia();
-// cv::imshow("Imagem para Filtrar", cv::imread("moire.tif"));
+
     
     cv::waitKey(0);
 
